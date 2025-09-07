@@ -1,0 +1,17 @@
+[
+  {
+    "title": "นิยายสายลับ",
+    "author": "คุณสายลับ",
+    "description": "เรื่องราวของสายลับ...",
+    "coverImage": "1.png",
+    "publishedYear": 2025
+  },
+  {
+    "title": "รักข้ามมิติ",
+    "author": "นางเอกสาว",
+    "description": "เมื่อความรักข้ามกาลเวลา...",
+    "coverImage": "2.png",
+    "publishedYear": 2022
+  }
+]
+

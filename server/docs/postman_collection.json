@@ -1,0 +1,180 @@
+{
+  "info": {
+    "name": "Fiction Book Review API",
+    "_postman_id": "4d7e8f28-6c2f-4b6d-9d0c-abc123456789",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/auth/register" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"alice\",\n  \"displayName\": \"Alice\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"Password123\",\n  \"confirmPassword\": \"Password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/auth/login" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emailOrUsername\": \"alice@example.com\",\n  \"password\": \"Password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/auth/forgot-password" },
+            "body": { "mode": "raw", "raw": "{ \n  \"email\": \"alice@example.com\"\n}" }
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/auth/reset-password" },
+            "body": { "mode": "raw", "raw": "{ \n  \"token\": \"<RESET_TOKEN>\",\n  \"newPassword\": \"NewPass123!\"\n}" }
+          }
+        },
+        {
+          "name": "Delete Account",
+          "request": {
+            "method": "DELETE",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/auth/account" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/user/profile" }
+          }
+        },
+        {
+          "name": "Update Profile (multipart)",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/user/profile" },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "displayName", "value": "Alice Updated", "type": "text" },
+                { "key": "username", "value": "alice", "type": "text" },
+                { "key": "profileImage", "type": "file", "src": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Email",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/user/email" },
+            "body": { "mode": "raw", "raw": "{ \n  \"newEmail\": \"alice.new@example.com\",\n  \"password\": \"Password123\"\n}" }
+          }
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/user/password" },
+            "body": { "mode": "raw", "raw": "{ \n  \"oldPassword\": \"Password123\",\n  \"newPassword\": \"NewPass123!\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Books",
+      "item": [
+        {
+          "name": "List Books",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/book?page=1&limit=12" } }
+        },
+        {
+          "name": "Get Book by Id",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/book/1" } }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/review/books/1/reviews" },
+            "body": { "mode": "raw", "raw": "{ \n  \"rating\": 5, \n  \"content\": \"ชอบมาก\"\n}" }
+          }
+        },
+        {
+          "name": "List Book Reviews",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/review/books/1/reviews?page=1&limit=10" } }
+        },
+        {
+          "name": "List User Reviews",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/review/users/1/reviews?page=1&limit=10" } }
+        },
+        {
+          "name": "Update Review",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{baseUrl}}/review/123" },
+            "body": { "mode": "raw", "raw": "{ \n  \"rating\": 4, \n  \"content\": \"ปรับความเห็น\"\n}" }
+          }
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "method": "DELETE",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/review/123" }
+          }
+        }
+      ]
+    }
+  ]
+}
+

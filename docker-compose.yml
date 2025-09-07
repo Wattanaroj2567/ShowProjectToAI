@@ -1,0 +1,73 @@
+version: "3.9"
+
+networks:
+  app-net: {}
+
+volumes:
+  mysql_data: {}
+
+services:
+  mysql:
+    image: mysql:8.0
+    # ไม่ตั้ง container_name เพื่อลดปัญหา alias/เครือข่าย
+    command: >
+      --default-authentication-plugin=caching_sha2_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+    environment:
+      TZ: Asia/Bangkok
+      MYSQL_ROOT_PASSWORD: "268033"
+      MYSQL_DATABASE: "fiction_book_review"
+      MYSQL_USER: "admin"
+      MYSQL_PASSWORD: "Tawan@268033"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p268033"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    networks:
+      app-net:
+        aliases:
+          - mysql         # ให้แน่ใจว่าชื่อ 'mysql' ถูก resolve ได้
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    env_file:
+      - ./server/.env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./server:/app
+      - ./server/uploads:/app/uploads
+      - /app/node_modules
+    # Use npm install because server does not include a package-lock.json
+    command: sh -lc "npm install && npm run dev"
+    networks:
+      app-net: {}
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    environment:
+      TZ: Asia/Bangkok
+      # ให้ client ชี้ไปยัง API base ที่ถูกต้อง
+      VITE_API_BASE: http://localhost:8080/api
+      CHOKIDAR_USEPOLLING: "true"
+    depends_on:
+      - server
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    command: sh -lc "npm ci && npm run dev -- --host 0.0.0.0"
+    networks:
+      app-net: {}
