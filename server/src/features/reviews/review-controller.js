@@ -37,7 +37,13 @@ exports.getBookReviews = async (req, res) => {
     }
     const { count, rows: reviews } = await Review.findAndCountAll({
       where: { bookId },
-      include: [{ model: User, attributes: ["id", "displayName", "profileImage"], where: { deletedAt: null } }],
+      include: [
+        {
+          model: User,
+          attributes: ["id", "displayName", "profileImage"],
+          required: true,
+        },
+      ],
       order: [["createdAt", "DESC"]],
       limit,
       offset,
@@ -62,7 +68,13 @@ exports.getUserReviews = async (req, res) => {
     }
     const { count, rows: reviews } = await Review.findAndCountAll({
       where: { userId },
-      include: [{ model: Book, attributes: ["id", "title", "coverImage"], where: { deletedAt: null } }],
+      include: [
+        {
+          model: Book,
+          attributes: ["id", "title", "coverImage"],
+          required: true,
+        },
+      ],
       order: [["createdAt", "DESC"]],
       limit,
       offset,

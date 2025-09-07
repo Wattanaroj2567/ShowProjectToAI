@@ -1,6 +1,6 @@
-// server/src/db/sequelize.js
+// server/src/config/database.js
 const { Sequelize } = require("sequelize")
-const config = require("../config")
+const config = require("./index")
 
 const sequelize = new Sequelize(
   config.db.name,

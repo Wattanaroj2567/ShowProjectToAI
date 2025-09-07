@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Alert, Box, Button, Divider, Paper, Stack, TextField, Typography, Link } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import api from '@/lib/api'
+import { notifySuccess, notifyError } from '@/lib/notify'
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('')
@@ -15,9 +16,11 @@ export default function ForgotPassword() {
     try {
       await api.post('/auth/forgot-password', { email })
       setMsg('ถ้ามีอีเมลนี้ในระบบ ระบบจะส่งลิงก์รีเซ็ตให้ทันที')
+      notifySuccess('ส่งลิงก์รีเซ็ตไปที่อีเมลแล้ว')
       setEmail('')
     } catch (err) {
       setMsg(err?.response?.data?.message || 'ไม่สามารถส่งคำขอรีเซ็ตรหัสผ่านได้')
+      notifyError(err?.response?.data?.message || 'ส่งคำขอรีเซ็ตไม่สำเร็จ')
     } finally {
       setLoading(false)
     }
@@ -32,7 +35,7 @@ export default function ForgotPassword() {
           <Box component="form" onSubmit={onSubmit}>
             <Stack spacing={2}>
               <TextField label="อีเมล" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required fullWidth />
-              <Button type="submit" variant="contained" size="large" disabled={loading} sx={{ alignSelf: 'center', px: 5, minWidth: 260 }}>ส่งลิงก์รีเซ็ต</Button>
+              <Button type="submit" variant="contained" size="large" disabled={loading} fullWidth>ส่งลิงก์รีเซ็ต</Button>
             </Stack>
           </Box>
           <Divider flexItem sx={{ my: 1 }} />

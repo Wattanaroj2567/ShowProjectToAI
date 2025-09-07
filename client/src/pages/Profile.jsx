@@ -5,6 +5,7 @@ import { toApiAsset, resolveProfileImagePath } from '@/lib/url'
 import { useAuth } from '@/contexts/useAuth'
 import { useNavigate } from 'react-router-dom'
 import AutoWidthTextField, { measureCh } from '@/components/common/AutoWidthTextField.jsx'
+import { notifySuccess, notifyError } from '@/lib/notify'
 
 export default function Profile() {
   const { setUser, logout } = useAuth()
@@ -49,6 +50,7 @@ export default function Profile() {
       setUser((u) => (u ? { ...u, displayName: updated.displayName } : u))
     } catch (err) {
       setError(err?.response?.data?.message || 'อัปเดตชื่อที่แสดงไม่สำเร็จ')
+      notifyError(err?.response?.data?.message || 'อัปเดตชื่อที่แสดงไม่สำเร็จ')
     } finally {
       setSaving(false)
     }
@@ -63,6 +65,7 @@ export default function Profile() {
       setUser((u) => (u ? { ...u, username: updated.username } : u))
     } catch (err) {
       setError(err?.response?.data?.message || 'อัปเดตชื่อผู้ใช้ไม่สำเร็จ')
+      notifyError(err?.response?.data?.message || 'อัปเดตชื่อผู้ใช้ไม่สำเร็จ')
     } finally {
       setSaving(false)
     }
@@ -81,6 +84,7 @@ export default function Profile() {
       setFile(null)
     } catch (err) {
       setError(err?.response?.data?.message || 'อัปโหลดรูปไม่สำเร็จ')
+      notifyError(err?.response?.data?.message || 'อัปโหลดรูปไม่สำเร็จ')
     } finally {
       setSaving(false)
     }
@@ -117,7 +121,7 @@ export default function Profile() {
             {active === 0 && (
               <Stack spacing={2} maxWidth={520}>
                 <TextField label="ชื่อที่แสดง" value={displayName} onChange={(e) => setDisplayName(e.target.value)} fullWidth />
-                <Button variant="contained" disabled={saving} onClick={saveDisplayName} sx={{ alignSelf: 'center', px: 5, minWidth: 260 }}>บันทึก</Button>
+                <Button variant="contained" size="large" disabled={saving} onClick={saveDisplayName} fullWidth>บันทึก</Button>
               </Stack>
             )}
 
@@ -125,7 +129,7 @@ export default function Profile() {
             {active === 1 && (
               <Stack spacing={2} maxWidth={520}>
                 <TextField label="ชื่อผู้ใช้" value={username} onChange={(e) => setUsername(e.target.value)} fullWidth />
-                <Button variant="contained" disabled={saving} onClick={saveUsername} sx={{ alignSelf: 'center', px: 5, minWidth: 260 }}>บันทึก</Button>
+                <Button variant="contained" size="large" disabled={saving} onClick={saveUsername} fullWidth>บันทึก</Button>
               </Stack>
             )}
 
@@ -154,7 +158,7 @@ export default function Profile() {
                           <AutoWidthTextField label="อีเมลปัจจุบัน" value={profile.email || ''} disabled widthCh={widthCh} />
                           <AutoWidthTextField label="อีเมลใหม่" type="email" value={emailForm.newEmail} onChange={(e) => setEmailForm({ ...emailForm, newEmail: e.target.value })} widthCh={widthCh} />
                           <TextField label="รหัสผ่านปัจจุบัน" type="password" value={emailForm.password} onChange={(e) => setEmailForm({ ...emailForm, password: e.target.value })} sx={{ width: `${widthCh}ch`, maxWidth: '100%' }} />
-                          <Button variant="contained" disabled={saving} sx={{ alignSelf: 'center', px: 5, minWidth: 260 }} onClick={async () => {
+                          <Button variant="contained" size="large" disabled={saving} fullWidth onClick={async () => {
                             setEmailMsg('')
                             setSaving(true)
                             try {
@@ -162,8 +166,10 @@ export default function Profile() {
                               setEmailMsg('สำเร็จ: ' + (data?.message || 'เปลี่ยนอีเมลสำเร็จ'))
                               setProfile((p) => ({ ...p, email: emailForm.newEmail }))
                               setEmailForm({ newEmail: '', password: '' })
+                              notifySuccess('เปลี่ยนอีเมลสำเร็จ')
                             } catch (err) {
                               setEmailMsg(err?.response?.data?.message || 'เปลี่ยนอีเมลไม่สำเร็จ')
+                              notifyError(err?.response?.data?.message || 'เปลี่ยนอีเมลไม่สำเร็จ')
                             } finally {
                               setSaving(false)
                             }
@@ -182,15 +188,17 @@ export default function Profile() {
                 {pwdMsg && <Alert severity={pwdMsg.startsWith('สำเร็จ') ? 'success' : 'error'}>{pwdMsg}</Alert>}
                 <TextField label="รหัสผ่านเดิม" type="password" value={pwdForm.oldPassword} onChange={(e) => setPwdForm({ ...pwdForm, oldPassword: e.target.value })} fullWidth />
                 <TextField label="รหัสผ่านใหม่" type="password" value={pwdForm.newPassword} onChange={(e) => setPwdForm({ ...pwdForm, newPassword: e.target.value })} fullWidth />
-                <Button variant="contained" disabled={saving} sx={{ alignSelf: 'center', px: 5, minWidth: 260 }} onClick={async () => {
+                <Button variant="contained" size="large" disabled={saving} fullWidth onClick={async () => {
                   setPwdMsg('')
                   setSaving(true)
                   try {
                     const { data } = await api.put('/user/password', { oldPassword: pwdForm.oldPassword, newPassword: pwdForm.newPassword })
                     setPwdMsg(data?.message || 'สำเร็จ: เปลี่ยนรหัสผ่านสำเร็จ')
                     setPwdForm({ oldPassword: '', newPassword: '' })
+                    notifySuccess('เปลี่ยนรหัสผ่านสำเร็จ')
                   } catch (err) {
                     setPwdMsg(err?.response?.data?.message || 'เปลี่ยนรหัสผ่านไม่สำเร็จ')
+                    notifyError(err?.response?.data?.message || 'เปลี่ยนรหัสผ่านไม่สำเร็จ')
                   } finally {
                     setSaving(false)
                   }
@@ -214,7 +222,7 @@ export default function Profile() {
                   </Grid>
                 </Grid>
                 {file && (
-                  <Button variant="contained" disabled={saving} onClick={saveAvatar} sx={{ alignSelf: 'center', px: 5, minWidth: 260 }}>บันทึกรูปใหม่</Button>
+                  <Button variant="contained" size="large" disabled={saving} onClick={async () => { await saveAvatar(); notifySuccess('บันทึกรูปโปรไฟล์ใหม่แล้ว') }} fullWidth>บันทึกรูปใหม่</Button>
                 )}
                 <Divider />
                 <Typography variant="body2" color="text.secondary">
@@ -260,7 +268,7 @@ function DeleteAccountSection({ onDeleted }) {
       <Typography color="text.secondary">
         คำเตือน: การลบบัญชีจะเป็นการลบข้อมูลผู้ใช้และรีวิวทั้งหมดอย่างถาวร ไม่สามารถกู้คืนได้
       </Typography>
-      <Button variant="contained" color="error" onClick={() => setOpen(true)} sx={{ alignSelf: 'center', px: 5, minWidth: 260 }}>ลบบัญชี</Button>
+      <Button variant="contained" size="large" color="error" onClick={() => setOpen(true)} fullWidth>ลบบัญชี</Button>
 
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>ยืนยันการลบบัญชี</DialogTitle>
@@ -272,7 +280,7 @@ function DeleteAccountSection({ onDeleted }) {
         </DialogContent>
         <DialogActions>
           <Button variant="outlined" color="primary" onClick={() => setOpen(false)}>ยกเลิก</Button>
-          <Button variant="contained" color="error" disabled={confirm !== 'DELETE' || loading} onClick={handleDelete}>ยืนยันลบ</Button>
+          <Button variant="contained" color="error" disabled={confirm !== 'DELETE' || loading} onClick={() => { notifySuccess('ลบบัญชีสำเร็จ'); handleDelete(); }}>ยืนยันลบ</Button>
         </DialogActions>
       </Dialog>
     </Stack>

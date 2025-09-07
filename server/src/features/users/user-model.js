@@ -1,7 +1,7 @@
 // src/features/users/user-model.js
 const bcrypt = require("bcryptjs");
 const { DataTypes } = require("sequelize");
-const { sequelize } = require("../../db/sequelize");
+const { sequelize } = require("../../config/database");
 const { cleanupUserProfileImages } = require("../../core/services/file-service");
 
 const User = sequelize.define(

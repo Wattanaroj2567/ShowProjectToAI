@@ -26,10 +26,24 @@ export function toApiAsset(path) {
 // - otherwise prefix with '/images/' as a safe default
 export function resolveProfileImagePath(img) {
   // Return a usable image path or null (to trigger letter-avatar fallback)
-  if (!img || typeof img !== 'string') return null
-  if (/^https?:\/\//i.test(img)) return img
-  if (img.startsWith('profile-')) return `/uploads/profiles/${img}`
-  if (img.includes('default-avatar') || img.startsWith('avatars/')) return null
-  if (img.startsWith('/uploads') || img.startsWith('/images')) return img
-  return `/images/${img}`
+  if (!img) return null
+  if (typeof img !== 'string') return null
+  const s = img.trim()
+  if (!s) return null
+  // If string accidentally stored like "/images/https://..." (from older client), recover the absolute URL
+  const httpIdx = s.indexOf('http')
+  if (httpIdx > 0) {
+    const maybeAbs = s.slice(httpIdx)
+    if (/^https?:\/\//i.test(maybeAbs)) return maybeAbs
+  }
+  // Absolute URLs (e.g., Google profile photos) -> keep
+  if (/^https?:\/\//i.test(s)) return s
+  // Uploaded profile file name from our server
+  if (s.startsWith('profile-')) return `/uploads/profiles/${s}`
+  // Explicit default placeholders -> treat as no image
+  if (s.includes('default-avatar') || s.startsWith('avatars/')) return null
+  // Already a server path
+  if (s.startsWith('/uploads') || s.startsWith('/images')) return s
+  // Fallback under images
+  return `/images/${s}`
 }

@@ -7,10 +7,10 @@ const passport = require("passport")
 const dns = require("dns").promises
 
 const config = require("./src/config")
-const { sequelize } = require("./src/db/sequelize")
+const { sequelize } = require("./src/config/database")
 
 require("./src/model-registry")
-require("./src/auth/passport-setup.js")
+require("./src/config/passport.js")
 
 const authRoutes = require("./src/features/auth/auth-routes")
 const userRoutes = require("./src/features/users/user-routes")

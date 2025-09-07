@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Alert, Box, Button, Divider, Paper, Stack, TextField, Typography, Link } from '@mui/material'
 import { useNavigate, useSearchParams, Link as RouterLink } from 'react-router-dom'
 import api from '@/lib/api'
+import { notifySuccess, notifyError } from '@/lib/notify'
 
 export default function ResetPassword() {
   const [search] = useSearchParams()
@@ -18,10 +19,12 @@ export default function ResetPassword() {
     try {
       await api.put('/auth/reset-password', { token, newPassword })
       setMsg('รีเซ็ตรหัสผ่านสำเร็จ กรุณาเข้าสู่ระบบ')
+      notifySuccess('ตั้งรหัสผ่านใหม่สำเร็จ')
       setTimeout(() => navigate('/login'), 1200)
       setNewPassword('')
     } catch (err) {
       setMsg(err?.response?.data?.message || 'รีเซ็ตรหัสผ่านไม่สำเร็จ')
+      notifyError(err?.response?.data?.message || 'รีเซ็ตรหัสผ่านไม่สำเร็จ')
     } finally {
       setLoading(false)
     }
@@ -38,7 +41,7 @@ export default function ResetPassword() {
             </Box>
             {msg && <Alert severity={msg.startsWith('รีเซ็ต') ? 'success' : 'error'}>{msg}</Alert>}
             <TextField label="รหัสผ่านใหม่" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required fullWidth />
-            <Button type="submit" variant="contained" size="large" disabled={loading || !token} sx={{ alignSelf: 'center', px: 5, minWidth: 260 }}>ยืนยันรหัสผ่านใหม่</Button>
+            <Button type="submit" variant="contained" size="large" disabled={loading || !token} fullWidth>ยืนยันรหัสผ่านใหม่</Button>
             <Divider flexItem sx={{ my: 1 }} />
             <Typography variant="body2" sx={{ textAlign: 'left' }}>
               มีบัญชีอยู่แล้ว? <Link component={RouterLink} to="/login">เข้าสู่ระบบ</Link>

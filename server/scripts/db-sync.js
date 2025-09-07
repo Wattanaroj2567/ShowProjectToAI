@@ -1,6 +1,6 @@
 // scripts/db-sync.js
 require('dotenv').config();
-const { sequelize } = require('../src/db/sequelize');
+const { sequelize } = require('../src/config/database');
 require('../src/model-registry');
 
 (async () => {
